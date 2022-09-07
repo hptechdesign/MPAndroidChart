@@ -10,6 +10,8 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.core.content.ContextCompat;
+
+import android.os.Environment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,6 +40,10 @@ import com.github.mikephil.charting.utils.Utils;
 import com.xxmassdeveloper.mpchartexample.custom.MyMarkerView;
 import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,7 +67,7 @@ public class LineChartActivity1 extends DemoBase implements OnSeekBarChangeListe
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_linechart);
 
-        setTitle("LineChartActivity1");
+        setTitle("Arrunden Enviromon History");
 
         tvX = findViewById(R.id.tvXMax);
         tvY = findViewById(R.id.tvYMax);
@@ -70,7 +76,7 @@ public class LineChartActivity1 extends DemoBase implements OnSeekBarChangeListe
         seekBarX.setOnSeekBarChangeListener(this);
 
         seekBarY = findViewById(R.id.seekBar2);
-        seekBarY.setMax(180);
+        seekBarY.setMax(50);
         seekBarY.setOnSeekBarChangeListener(this);
 
 
@@ -78,7 +84,7 @@ public class LineChartActivity1 extends DemoBase implements OnSeekBarChangeListe
             chart = findViewById(R.id.chart1);
 
             // background color
-            chart.setBackgroundColor(Color.WHITE);
+            chart.setBackgroundColor(Color.GRAY);
 
             // disable description text
             chart.getDescription().setEnabled(false);
@@ -126,12 +132,12 @@ public class LineChartActivity1 extends DemoBase implements OnSeekBarChangeListe
             yAxis.enableGridDashedLine(10f, 10f, 0f);
 
             // axis range
-            yAxis.setAxisMaximum(200f);
-            yAxis.setAxisMinimum(-50f);
+            yAxis.setAxisMaximum(60f);
+            yAxis.setAxisMinimum(-20f);
         }
 
 
-        {   // // Create Limit Lines // //
+/*        {   // // Create Limit Lines // //
             LimitLine llXAxis = new LimitLine(9f, "Index 10");
             llXAxis.setLineWidth(4f);
             llXAxis.enableDashedLine(10f, 10f, 0f);
@@ -161,12 +167,12 @@ public class LineChartActivity1 extends DemoBase implements OnSeekBarChangeListe
             yAxis.addLimitLine(ll1);
             yAxis.addLimitLine(ll2);
             //xAxis.addLimitLine(llXAxis);
-        }
+        }*/
 
         // add data
-        seekBarX.setProgress(45);
-        seekBarY.setProgress(180);
-        setData(45, 180);
+        seekBarX.setProgress(30);
+        seekBarY.setProgress(30);
+        setData(30, 30);
 
         // draw points over time
         chart.animateX(1500);
@@ -180,11 +186,41 @@ public class LineChartActivity1 extends DemoBase implements OnSeekBarChangeListe
 
     private void setData(int count, float range) {
 
+//Find the directory for the SD Card using the API
+//*Don't* hardcode "/sdcard"
+        File sdcard = Environment.getExternalStorageDirectory();
+
+//Get the text file
+        File file = new File(sdcard,"file.txt");
+
+//Read text from file
+        StringBuilder text = new StringBuilder();
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                text.append(line);
+                text.append('\n');
+            }
+            br.close();
+        }
+        catch (IOException e) {
+            //You'll need to add proper error handling here
+        }
+
+//Find the view by its id
+        TextView tv = (TextView)findViewById(R.id.text_view);
+
+//Set the text
+        tv.setText(text.toString());
+
         ArrayList<Entry> values = new ArrayList<>();
 
         for (int i = 0; i < count; i++) {
 
-            float val = (float) (Math.random() * range) - 30;
+            float val = (float) (Math.random() * range) - 2;
             values.add(new Entry(i, val, getResources().getDrawable(R.drawable.star)));
         }
 
@@ -193,13 +229,13 @@ public class LineChartActivity1 extends DemoBase implements OnSeekBarChangeListe
         if (chart.getData() != null &&
                 chart.getData().getDataSetCount() > 0) {
             set1 = (LineDataSet) chart.getData().getDataSetByIndex(0);
-            set1.setValues(values);
+            set1.setEntries(values);
             set1.notifyDataSetChanged();
             chart.getData().notifyDataChanged();
             chart.notifyDataSetChanged();
         } else {
             // create a dataset and give it a type
-            set1 = new LineDataSet(values, "DataSet 1");
+            set1 = new LineDataSet(values, "Outside Temperature");
 
             set1.setDrawIcons(false);
 

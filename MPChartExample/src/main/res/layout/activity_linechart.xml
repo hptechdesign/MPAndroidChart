@@ -8,7 +8,14 @@
         android:id="@+id/chart1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/seekBar1" />
+        android:layout_above="@+id/seekBar1" >
+
+        <TextView
+            android:id="@+id/text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TextView" />
+    </com.github.mikephil.charting.charts.LineChart>
 
     <SeekBar
         android:id="@+id/seekBar2"
